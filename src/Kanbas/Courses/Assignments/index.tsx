@@ -5,7 +5,11 @@ import AssignmentControlButtons from "./AssignmentControlButtons";
 import { MdOutlineAssignment } from "react-icons/md";
 import { IoMdArrowDropdown } from "react-icons/io";
 import AssignmentsControlButtons from "./AssignmentsControlButtons";
+import { useParams } from "react-router";
+import * as db from "../../Database";
 export default function Assignments() {
+  const { cid } = useParams();
+  const assignments = db.assignments;
   return (
     <div>
       <div id="wd-assignments">
@@ -19,74 +23,33 @@ export default function Assignments() {
               <AssignmentsControlButtons />
             </div>
             <ul className="wd-assignments list-group rounded-0">
-              <li className="wd-assignment list-group-item p-3 ps-1 d-flex align-items-center">
-                <div className="d-flex align-items-center">
-                  <BsGripVertical className="me-2 fs-3" />
-                  <MdOutlineAssignment className="me-3 fs-3 text-success" />
-                  <div id="wd-a1">
-                    <a className="wd-assignment-link" href="#/Kanbas/Courses/1234/Assignments/123">
-                      A1 - ENV + HTML
-                    </a>
-                    <br />
-                    <span className="text-danger me-1">
-                      Multiple Modules
-                    </span>
-                    | <strong>Not available until</strong> May 6 at 12:00am |
-                    <span className="ms-1">
-                      <strong>Due</strong> May 13 at 11:59pm | 100pts
-                    </span>
-                  </div>
-                </div>
-                <div className="ms-auto d-flex align-items-center">
-                  <AssignmentControlButtons />
-                </div>
-              </li>
-              <li className="wd-assignment list-group-item p-3 ps-1 d-flex align-items-center">
-                <div className="d-flex align-items-center me-auto">
-                  <BsGripVertical className="me-2 fs-3" />
-                  <MdOutlineAssignment className="me-3 fs-3 text-success" />
-                  <div id="wd-a1">
-                    <a className="wd-assignment-link"
-                      href="#/Kanbas/Courses/1234/Assignments/123">
-                      A2 - CSS + BOOTSTRAP
-                    </a>
-                    <br />
-                    <span className="text-danger me-1">
-                      Multiple Modules
-                    </span>
-                    | <strong>Not available until</strong> May 6 at 12:00am |
-                    <span className="ms-1">
-                      <strong>Due</strong> May 13 at 11:59pm | 100pts
-                    </span>
-                  </div>
-                </div>
-                <div className="ms-auto d-flex align-items-center">
-                  <AssignmentControlButtons />
-                </div>
-              </li>
-              <li className="wd-assignment list-group-item p-3 ps-1 d-flex align-items-center">
-                <div className="d-flex align-items-center me-auto">
-                  <BsGripVertical className="me-2 fs-3" />
-                  <MdOutlineAssignment className="me-3 fs-3 text-success" />
-                  <div id="wd-a1">
-                    <a className="wd-assignment-link"
-                      href="#/Kanbas/Courses/1234/Assignments/123">
-                      A3 - JAVASCRIPT + REACT
-                    </a>
-                    <br />
-                    <span className="text-danger me-1">
-                      Multiple Modules
-                    </span>
-                    | <strong>Not available until</strong> May 6 at 12:00am |
-                    <span className="ms-1">
-                      <strong>Due</strong> May 13 at 11:59pm | 100pts
-                    </span>
-                  </div>
-                </div>
-                <div className="ms-auto d-flex align-items-center">
-                  <AssignmentControlButtons />
-                </div>
-              </li>
+              {assignments
+                .filter((assignment: any) => assignment.course === cid)
+                .map((assignment: any) => (
+                  <li className="wd-assignment list-group-item p-3 ps-1 d-flex align-items-center">
+                    <div className="d-flex align-items-center">
+                      <BsGripVertical className="me-2 fs-3" />
+                      <MdOutlineAssignment className="me-3 fs-3 text-success" />
+                      <div className={`wd-${assignment._id}`}>
+                        <a className="wd-assignment-link" href={`#/Kanbas/Courses/${cid}/Assignments/${assignment._id}`}>
+                          {assignment.title}
+                        </a>
+                        <br />
+                        <span className="text-danger me-1">
+                          Multiple Modules
+                        </span>
+                        | <strong>Not available until</strong> May 6 at 12:00am |
+                        <span className="ms-1">
+                          <strong>Due</strong> May 13 at 11:59pm | 100pts
+                        </span>
+                      </div>
+                    </div>
+                    <div className="ms-auto d-flex align-items-center">
+                      <AssignmentControlButtons />
+                    </div>
+                  </li>
+                ))
+              }
             </ul>
           </li >
         </ul>
