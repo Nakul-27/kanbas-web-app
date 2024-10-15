@@ -1,5 +1,6 @@
 import { CiCalendar } from "react-icons/ci";
 import { useParams } from "react-router";
+import { Link } from "react-router-dom";
 import * as db from "../../Database";
 
 export default function AssignmentEditor() {
@@ -101,7 +102,7 @@ export default function AssignmentEditor() {
                                 <label htmlFor="wd-assign-to" className="form-label col-sm-3 text-end">Assign</label>
                                 <div className="col-sm-9">
                                     <strong>Assign To</strong><br />
-                                    <input id="wd-assign-to" className="form-control" value={"Everyone"} /><br />
+                                    <input id="wd-assign-to" className="form-control" /><br />
                                     <strong>Due</strong><br />
                                     <div className="form-control input-group mb-2">
                                         <input
@@ -149,12 +150,16 @@ export default function AssignmentEditor() {
 
                             <hr />
                             <div className="text-end">
-                                <button id="wd-cancel" onClick={() => alert("Cancel")} type="button" className="btn btn-md btn-secondary me-2">
+                                <Link to={`/Kanbas/Courses/${cid}/Assignments`}
+                                    className="btn btn-md btn-secondary me-2"
+                                >
                                     Cancel
-                                </button>
-                                <button id="wd-save" onClick={() => alert("Save")} type="button" className="btn btn-md btn-danger">
+                                </Link>
+                                <Link to={`/Kanbas/Courses/${cid}/Assignments`}
+                                    className="btn btn-md btn-danger"
+                                >
                                     Save
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     </div>
