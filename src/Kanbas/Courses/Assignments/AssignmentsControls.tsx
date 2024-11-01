@@ -1,7 +1,11 @@
 import { FaPlus } from "react-icons/fa6";
 import { CiSearch } from "react-icons/ci";
+import { Navigate, useNavigate } from "react-router";
+import ProtectedRouteFaculty from "../../Account/ProtectedRouteFaculty";
 
 export default function AssignmentsControls() {
+    const navigate = useNavigate();
+
     return (
         <div id="wd-assignments-controls" className="d-flex justify-content-end">
             <div
@@ -22,10 +26,12 @@ export default function AssignmentsControls() {
                 Group
             </button>
             <button id="wd-add-assignment"
-                className="btn btn-danger text-nowrap">
+                className="btn btn-danger text-nowrap"
+                onClick={() => navigate("new")}
+            >
                 <FaPlus className="me-1" />
                 Assignment
             </button>
-        </div>
+        </div >
     );
 }

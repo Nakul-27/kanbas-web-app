@@ -1,15 +1,20 @@
 import AssignmentsControls from "./AssignmentsControls";
 import { BsGripVertical } from "react-icons/bs";
-import { FaPlus } from "react-icons/fa6";
 import AssignmentControlButtons from "./AssignmentControlButtons";
 import { MdOutlineAssignment } from "react-icons/md";
 import { IoMdArrowDropdown } from "react-icons/io";
 import AssignmentsControlButtons from "./AssignmentsControlButtons";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import * as db from "../../Database";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteAssignment } from "./reducer";
 export default function Assignments() {
   const { cid } = useParams();
-  const assignments = db.assignments;
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const assignments = useSelector((state: any) => state.assignmentReducer.assignments);
+
   return (
     <div>
       <div id="wd-assignments">
@@ -45,7 +50,7 @@ export default function Assignments() {
                       </div>
                     </div>
                     <div className="ms-auto d-flex align-items-center">
-                      <AssignmentControlButtons />
+                      <AssignmentControlButtons deleteAssignment={() => dispatch(deleteAssignment(assignment._id))} />
                     </div>
                   </li>
                 ))
