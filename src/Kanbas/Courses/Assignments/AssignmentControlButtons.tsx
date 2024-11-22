@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { IoEllipsisVertical } from "react-icons/io5";
 import GreenCheckmark from "./GreenCheckmark";
-export default function AssignmentControlButtons({ deleteAssignment }: {
-    deleteAssignment: () => void;
+export default function AssignmentControlButtons({ assignmentId, deleteAssignment }: {
+    assignmentId: string;
+    deleteAssignment: (assignmentId: string) => void;
 }) {
     const [confirm, setConfirm] = useState(false);
 
     const handleDelete = () => {
-        deleteAssignment();
+        deleteAssignment(assignmentId);
         setConfirm(false);
     }
 

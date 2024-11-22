@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { addAssignment, updateAssignment } from "./reducer";
+import * as client from "./client";
 
 export default function AssignmentEditor() {
     const { cid, aid } = useParams();
@@ -33,6 +34,16 @@ export default function AssignmentEditor() {
                 availableUntilDate: assignment?.availableUntilDate || "2024-05-13",
             });
         }
+    }
+
+    const createAssignment = async (assignment: any) => {
+        const newAssignment = await client.createAssignment(cid as string, assignment);
+        dispatch(addAssignment(newAssignment));
+    }
+
+    const saveAssignment = async (assignment: any) => {
+        const status = await client.updateAssignment(assignment);
+        dispatch(updateAssignment(assignment));
     }
 
     useEffect(() => {
@@ -207,9 +218,19 @@ export default function AssignmentEditor() {
                                 };
 
                                 if (aid === "new") {
-                                    dispatch(addAssignment(newAssignment));
+                                    createAssignment(newAssignment);
+                                    /* createAssignment({
+                                        title: assignmentForm.title,
+                                        description: assignmentForm.description || "",
+                                        points: assignmentForm.points,
+                                        dueDate: assignmentForm.dueDate,
+                                        availableFromDate: assignmentForm.availableFromDate || "2024-05-06",
+                                        availableUntilDate: assignmentForm.availableUntilDate || "2024-05-13",
+
+                                    }); */
                                 } else {
-                                    dispatch(updateAssignment(newAssignment));
+                                    saveAssignment(newAssignment);
+                                    // dispatch(updateAssignment(newAssignment));
                                 }
                                 navigate(-1);
                             }}
@@ -220,6 +241,6 @@ export default function AssignmentEditor() {
                 </div>
             </div>
             ))
-        </div>
+        </div >
     );
 }

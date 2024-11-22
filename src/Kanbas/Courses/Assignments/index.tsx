@@ -6,15 +6,29 @@ import { IoMdArrowDropdown } from "react-icons/io";
 import AssignmentsControlButtons from "./AssignmentsControlButtons";
 import { useNavigate, useParams } from "react-router";
 import * as db from "../../Database";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import * as client from './client';
 import { useDispatch, useSelector } from "react-redux";
-import { deleteAssignment } from "./reducer";
+import { setAssignments, deleteAssignment } from "./reducer";
 export default function Assignments() {
   const { cid } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const assignments = useSelector((state: any) => state.assignmentReducer.assignments);
 
+  const fetchAssignments = async () => {
+    const assignments = await client.findAssignmentForCourse(cid as string);
+    dispatch(setAssignments(assignments));
+  }
+
+  const removeAssignment = async (assignmentId: string) => {
+    await client.deleteAssignment(assignmentId as string);
+    dispatch(deleteAssignment(assignmentId));
+  }
+
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
   return (
     <div>
       <div id="wd-assignments">
@@ -50,7 +64,7 @@ export default function Assignments() {
                       </div>
                     </div>
                     <div className="ms-auto d-flex align-items-center">
-                      <AssignmentControlButtons deleteAssignment={() => dispatch(deleteAssignment(assignment._id))} />
+                      <AssignmentControlButtons assignmentId={assignment._id} deleteAssignment={() => removeAssignment(assignment._id)} />
                     </div>
                   </li>
                 ))
