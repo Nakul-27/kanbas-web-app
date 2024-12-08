@@ -71,16 +71,19 @@ export default function Dashboard({ courses, course, setCourse, addNewCourse, de
                     {courses.filter((course) => {
                         if (currentUser.role === "FACULTY") {
                             return true;
-                        } else if (currentUser.role === "STUDENT") {
-                            return showCourses ||
-                                enrollments.some(
-                                    (enrollment: { user: string, course: string }) =>
-                                        enrollment.user === currentUser._id &&
-                                        enrollment.course === course._id
-                                );
                         } else {
                             return false;
                         }
+                        // else if (currentUser.role === "STUDENT") {
+                        //     return showCourses ||
+                        //         enrollments.some(
+                        //             (enrollment: { user: string, course: string }) =>
+                        //                 enrollment.user === currentUser._id &&
+                        //                 enrollment.course === course._id
+                        //         );
+                        // } else {
+                        //     return false;
+                        // }
                     }).map((course) => (
                         <div className="wd-dashboard-course col" style={{ width: "270px" }}>
                             <div className="card rounded-3 overflow-hidden">
