@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router";
 import * as db from "../../Database";
 import { useEffect, useState } from "react";
 import * as client from './client';
+import * as coursesClient from "../client";
 import { useDispatch, useSelector } from "react-redux";
 import { setAssignments, deleteAssignment } from "./reducer";
 export default function Assignments() {
@@ -17,7 +18,7 @@ export default function Assignments() {
   const assignments = useSelector((state: any) => state.assignmentReducer.assignments);
 
   const fetchAssignments = async () => {
-    const assignments = await client.findAssignmentForCourse(cid as string);
+    const assignments = await coursesClient.findAssignmentForCourse(cid as string);
     dispatch(setAssignments(assignments));
   }
 

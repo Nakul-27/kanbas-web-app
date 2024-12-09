@@ -6,14 +6,18 @@ import ProtectedRouteFaculty from "./Account/ProtectedRouteFaculty";
 import ProtectedRouteStudent from "./Account/ProtectedRouteStudent";
 import * as db from "./Database";
 import { enrollCourse, setEnrollments, unenrollCourse } from "./reducer";
+import * as courseClient from "./Courses/client";
 
-export default function Dashboard({ courses, course, setCourse, addNewCourse, deleteCourse, updateCourse }: {
+export default function Dashboard({ courses, course, setCourse, addNewCourse, deleteCourse, updateCourse, enrolling, setEnrolling, updateEnrollment }: {
     courses: any[];
     course: any;
     setCourse: (course: any) => void;
     addNewCourse: () => void;
     deleteCourse: (course: any) => void;
-    updateCourse: () => void
+    updateCourse: () => void;
+    enrolling: boolean;
+    setEnrolling: (enrolling: boolean) => void;
+    updateEnrollment: (courseId: string, enrolled: boolean) => void;
 }) {
 
     const { currentUser } = useSelector((state: any) => state.accountReducer);
@@ -22,9 +26,10 @@ export default function Dashboard({ courses, course, setCourse, addNewCourse, de
 
     const [showCourses, setShowCourses] = useState(false);
 
-    const fetchEnrollments = () => {
+    const fetchEnrollments = async () => {
         const savedEnrollments = localStorage.getItem("enrollments");
         const parsedEnrollments = savedEnrollments ? JSON.parse(savedEnrollments) : [];
+        // const savedEnrollments = await courseClient.fetchCoursesForEnrolledUer(currentUser._id);
         dispatch(setEnrollments(parsedEnrollments));
     }
 
@@ -34,7 +39,12 @@ export default function Dashboard({ courses, course, setCourse, addNewCourse, de
 
     return (
         <div id="wd-dashboard">
-            <h1 id="wd-dashboard-title">Dashboard</h1> <hr />
+            <h1 id="wd-dashboard-title">
+                Dashboard
+                <button onClick={() => setEnrolling(!enrolling)} className="float-end btn btn-primary" >
+                    {enrolling ? "My Courses" : "All Courses"}
+                </button>
+            </h1> <hr />
             <ProtectedRouteFaculty>
                 <h5>
                     New Course
@@ -68,89 +78,102 @@ export default function Dashboard({ courses, course, setCourse, addNewCourse, de
             <h2 id="wd-dashboard-published">Published Courses ({courses.length})</h2> <hr />
             <div id="wd-dashboard-courses" className="row">
                 <div className="row row-cols-1 row-cols-md-4 g-4">
-                    {courses.filter((course) => {
-                        if (currentUser.role === "FACULTY") {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                        // else if (currentUser.role === "STUDENT") {
-                        //     return showCourses ||
-                        //         enrollments.some(
-                        //             (enrollment: { user: string, course: string }) =>
-                        //                 enrollment.user === currentUser._id &&
-                        //                 enrollment.course === course._id
-                        //         );
-                        // } else {
-                        //     return false;
-                        // }
-                    }).map((course) => (
-                        <div className="wd-dashboard-course col" style={{ width: "270px" }}>
-                            <div className="card rounded-3 overflow-hidden">
-                                <div>
-                                    <Link to={`/Kanbas/Courses/${course._id}/Home`}
-                                        className="wd-dashboard-course-link text-decoartion-none text-dark">
-                                        <img src={`${course.image}`} width="100%" height={160} />
-                                        <div className="card-body">
-                                            <h5 className="wd-dashboard-course-title d-block text-truncate">
-                                                {course.name}
-                                            </h5>
-                                            <p className="wd-dashboard-course-title card-text overflow-y-hidden"
-                                                style={{ maxHeight: 100 }}
+                    {courses
+                        // .filter((course) => {
+                        //     if (currentUser.role === "FACULTY") {
+                        //         return true;
+                        //     }
+                        //     // else {
+                        //     //     return false;
+                        //     // }
+                        //     else if (currentUser.role === "STUDENT") {
+                        //         return showCourses ||
+                        //             enrollments.some(
+                        //                 (enrollment: { user: string, course: string }) =>
+                        //                     enrollment.user === currentUser._id &&
+                        //                     enrollment.course === course._id
+                        //             );
+                        //     } else {
+                        //         return false;
+                        //     }
+                        // })
+                        .map((course) => (
+                            <div className="wd-dashboard-course col" style={{ width: "270px" }}>
+                                <div className="card rounded-3 overflow-hidden">
+                                    <div>
+                                        <Link to={`/Kanbas/Courses/${course._id}/Home`}
+                                            className="wd-dashboard-course-link text-decoartion-none text-dark">
+                                            <img src={`${course.image}`} width="100%" height={160} />
+                                            <div className="card-body">
+                                                <h5 className="wd-dashboard-course-title d-block text-truncate">
+                                                    {enrolling && (
+                                                        <button
+                                                            onClick={(event) => {
+                                                                event.preventDefault();
+                                                                updateEnrollment(course._id, !course.enrolled);
+                                                            }}
+                                                            className={`btn ${course.enrolled ? "btn-danger" : "btn-success"} float-end`} >
+                                                            {course.enrolled ? "Unenroll" : "Enroll"}
+                                                        </button>
+                                                    )}
+                                                    {course.name}
+                                                </h5>
+                                                <p className="wd-dashboard-course-title card-text overflow-y-hidden"
+                                                    style={{ maxHeight: 100 }}
+                                                >
+                                                    {course.description}
+                                                </p>
+                                            </div>
+                                            <NavLink to={`#/Kanbas/Courses/${course._id}/Home`} className="bg-white"> <LiaPaperPlane size={30} /></NavLink>
+                                        </Link>
+
+                                        <ProtectedRouteFaculty>
+                                            <button onClick={(event) => {
+                                                event.preventDefault();
+                                                deleteCourse(course._id);
+                                            }}
+                                                className="btn btn-danger me-2 float-end"
+                                                id="wd-delete-course-click">
+                                                Delete
+                                            </button>
+                                            <button onClick={(event) => {
+                                                event.preventDefault();
+                                                setCourse(course);
+                                            }}
+                                                className="btn btn-warning me-2 float-end"
+                                                id="wd-edit-course-click"
                                             >
-                                                {course.description}
-                                            </p>
-                                        </div>
-                                        <NavLink to={`#/Kanbas/Courses/${course._id}/Home`} className="bg-white"> <LiaPaperPlane size={30} /></NavLink>
-                                    </Link>
-
-                                    <ProtectedRouteFaculty>
-                                        <button onClick={(event) => {
-                                            event.preventDefault();
-                                            deleteCourse(course._id);
-                                        }}
-                                            className="btn btn-danger me-2 float-end"
-                                            id="wd-delete-course-click">
-                                            Delete
-                                        </button>
-                                        <button onClick={(event) => {
-                                            event.preventDefault();
-                                            setCourse(course);
-                                        }}
-                                            className="btn btn-warning me-2 float-end"
-                                            id="wd-edit-course-click"
-                                        >
-                                            Edit
-                                        </button>
-                                    </ProtectedRouteFaculty>
-
-                                    <ProtectedRouteStudent>
-                                        {enrollments.some((enrollment: any) =>
-                                            enrollment.user === currentUser._id &&
-                                            enrollment.course === course._id) ? (
-                                            <button className="btn btn-danger float-end"
-                                                onClick={() => {
-                                                    dispatch(unenrollCourse({
-                                                        userId: currentUser._id, courseId: course._id
-                                                    }));
-                                                }}>
-                                                Unenroll
+                                                Edit
                                             </button>
-                                        ) : (
-                                            <button className="btn btn-success float-end"
-                                                onClick={() => {
-                                                    dispatch(enrollCourse({
-                                                        userId: currentUser._id, courseId: course._id
-                                                    }))
-                                                }}>
-                                                Enroll
-                                            </button>
-                                        )}
-                                    </ProtectedRouteStudent>
+                                        </ProtectedRouteFaculty>
+
+                                        <ProtectedRouteStudent>
+                                            {enrollments.some((enrollment: any) =>
+                                                enrollment.user === currentUser._id &&
+                                                enrollment.course === course._id) ? (
+                                                <button className="btn btn-danger float-end"
+                                                    onClick={() => {
+                                                        dispatch(unenrollCourse({
+                                                            userId: currentUser._id, courseId: course._id
+                                                        }));
+                                                    }}>
+                                                    Unenroll
+                                                </button>
+                                            ) : (
+                                                <button className="btn btn-success float-end"
+                                                    onClick={() => {
+                                                        dispatch(enrollCourse({
+                                                            userId: currentUser._id, courseId: course._id
+                                                        }))
+                                                    }}>
+                                                    Enroll
+                                                </button>
+                                            )}
+                                        </ProtectedRouteStudent>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                 </div>
             </div>
         </div >

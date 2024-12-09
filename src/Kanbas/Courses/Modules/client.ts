@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const REMOTE_SERVER = process.env.REACT_APP_REMOTE_SERVER;
+const axiosWithCredentials = axios.create({ withCredentials: true });
 const COURSES_API = `${REMOTE_SERVER}/api/courses`;
 const MODULES_API = `${REMOTE_SERVER}/api/modules`;
 export const findModulesForCourse = async (courseId: string) => {
@@ -16,6 +17,6 @@ export const deleteModule = async (moduleId: string) => {
 	return response.data;
 };
 export const updateModule = async (module: any) => {
-	const { data } = await axios.put(`${MODULES_API}/${module._id}`, module);
+	const { data } = await axiosWithCredentials.put(`${MODULES_API}/${module._id}`, module);
 	return data;
 };
